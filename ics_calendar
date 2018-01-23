@@ -1,0 +1,19 @@
+Sub Macro4()
+' Macro4 Macro
+    Range("A2:C12").Select
+    Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
+    Range("A2").Select
+    ActiveCell.FormulaR1C1 = "=R[-1]C+1"
+    Range("B3").Select
+    Selection.End(xlUp).Select
+    Selection.Cut
+    Range("A10").Select
+    ActiveSheet.Paste
+    Selection.End(xlUp).Select
+    Range("C1").Select
+    Selection.Cut
+    Range("A5").Select
+    ActiveSheet.Paste
+    Selection.End(xlDown).Select
+    Selection.End(xlDown).Select
+End Sub
