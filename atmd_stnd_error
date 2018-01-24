@@ -1,0 +1,62 @@
+https://acsdatacommunity.prb.org/p/2015_acs_conference
+Automated Standard Error Calculation with PUMS Data Excel Pivot Table | Toshihiko Murata, Salem, Oregon
+http://www.ebmcdn.net/prb/flash/acs-may15/video-viewer.php?viewnode=18-ches-bc-murata
+##############################################################
+Sub get_se()
+
+Dim pwgtp00
+Dim pwgtpxx
+Dim pwse()
+Dim i,j,k,x,y
+
+On Error Resume Next
+ActiveSheet.Range("_get_se_").Clear
+ActiveWorkbook.Names("_get_se_").Delete
+On Error GoTo 0
+
+With ActiveSheet.PivotTables(1)
+
+	For i = .DataFields.Count To 1 Step -1
+		.PivotFields(.DataFields(i),Name).Orientation = xlHidden
+	Next
+
+	.PivotFields("PWGTP").Orientation = xlDataField
+	pwgtp00 = .DataBodyRange
+
+	x = .DataBodyRange.Row
+	y = .DataBodyRange.Column + .DataBodyRange.Columns.Count +1
+
+	ReDim pwse(1 To UBound(pwgtp00,1),1 To UBound(pwgtp00, 2))
+
+	.PivotFields("Sum of PWGTP").Orientation = xlHidden
+
+	i = 1
+
+	For i = 1 To 80
+		.PivotFields("pwgtp" &i).Orientation = xlDataField
+		pwgtpxx = .DataBodyRange
+		For j = 1 To UBound(pwgt00, 1)
+			For k = 1 To UBound(pwgtp00, 2)
+				pwse(j,k) = pwse(j,k) + (pwgtpxx(j,k) - pwgtp00(j,k))^ 2
+			Next k
+		Next j
+		.PivotFields("Sum of PWGTP" & i).Orientation = xlHidden
+	Next i
+
+	For j = 1 To UBound(pwgtp00,1)
+		For k = 1 To UBound(pwgtp00,2)
+			pwse(j,k) = Sqr((4/80) * pwse(j,k))
+		Next k
+	Next j
+
+	.PivotFields("PWGTP").Orientation=xlDatafield
+End With
+
+ActiveSheet.Cells(x,y).Resize(UBound(pwgtp00,1),UBound(pwgtp00,2)).Select
+Selection = pwse
+
+ActiveWorkbook.Names.Add Name:="_get_se_", RefersToR1C1:="=" & ActiveSheet.Name & "!" & Selection.Address(ReferenceStyle:=xlR1C1)
+'ActiveWorkbook.Names.Add Name:="_get_se_", RefersToR1C1:="=" & ActiveSheet.Name & "!" &
+'Selection.Address(ReferenceStyle:=xlR1C1)
+
+End Sub
